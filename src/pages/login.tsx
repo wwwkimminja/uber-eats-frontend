@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { FormError } from '../components/form-error';
 import { LoginMutation, LoginMutationVariables } from '../__generated__/LoginMutation';
 import uberLogo from "../images/logo.svg"
+import { Button } from '../components/button';
+import { Link } from 'react-router-dom';
 
 const LOGIN_MUTATION=gql`
     mutation LoginMutation($loginInput:LoginInput!){
@@ -20,7 +22,9 @@ interface ILoginForm{
     password:string;
 }
 function Login() {
-    const {register,getValues,handleSubmit,formState:{errors}}= useForm<ILoginForm>();
+    const {register,getValues,handleSubmit,formState:{errors,isValid}}= useForm<ILoginForm>({
+        mode:"onChange",
+    });
     const onCompleted =(data:LoginMutation)=>{
         const {login:{error,ok,token}}=data;
         if(ok){
@@ -59,9 +63,12 @@ function Login() {
                 <input {...register("password",{required:"Password is required",minLength:10})} name="password"type="password" className='input' placeholder='Password'/>
                 {errors.password?.message&& <FormError errorMessage={errors.password?.message}/>}
                 {errors.password?.type==="minLength"&& <FormError errorMessage="Password must be than 10 chars"/>}
-                <button className='btn bg-lime-600'>{loading ?"Loading...":"Log In"}</button>
+              <Button canClick={isValid} loading={loading} actionText={"Log in"}/>
                 {loginMutationResult?.login.error && <FormError errorMessage={loginMutationResult.login.error}/>}
             </form>
+            <div>
+                New to Uber? <Link to="/create-account" className=" text-lime-600 hover:underline">Create an Account</Link>
+            </div>
         </div>
         </div>
   )
